@@ -540,8 +540,8 @@
 
           <!-- Form -->
           <form class="form-wrap" id="subscribe-form" action="https://formspree.io/f/mgodrvqw" method="POST">
-            <input type="text" name="nombre" placeholder="Tu nombre" required autocomplete="given-name">
-            <input type="email" name="email" placeholder="Email" required autocomplete="email">
+            <input type="text" name="nombre" placeholder="Tu nombre" required autocomplete="off">
+            <input type="email" name="email" placeholder="Email" required autocomplete="off">
             <!-- Hidden field para que Formspree redirija con el PDF -->
             <input type="hidden" name="_next" value="https://drive.google.com/file/d/1TkZtjCQ8II0cnSowtQTAuvJw_Q7puMSi/view?usp=drive_link">
             <input type="hidden" name="_subject" value="¡Tu Botiquín del Freelancer Aumentado está listo!">
@@ -741,3 +741,24 @@
 
 </body>
 </html>
+        // === Registrar contacto en Brevo lista #5 ===
+        try {
+          const fd2 = new FormData(form);
+          await fetch('https://api.brevo.com/v3/contacts', {
+            method: 'POST',
+            headers: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+              'api-key': 'BREVO_API_KEY_PLACEHOLDER'
+            },
+            body: JSON.stringify({
+              email: fd2.get('email'),
+              attributes: { FIRSTNAME: fd2.get('nombre') },
+              listIds: [5],
+              updateEnabled: true
+            })
+          });
+        } catch (brevoErr) {
+          console.warn('Brevo error (no bloquea el flujo):', brevoErr);
+        }
+
