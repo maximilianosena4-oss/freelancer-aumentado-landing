@@ -707,37 +707,42 @@
     const successBox = document.getElementById('success-box');
 
     form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      btn.textContent = 'Procesando...';
-      btn.disabled = true;
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const fd = new FormData(form);
+    const email = fd.get('email');
+    const nombre = fd.get('nombre');
 
-      const data = new FormData(form);
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
 
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: data,
-          headers: { 'Accept': 'application/json' }
-        });
+    try {
+      // 1. Formspree
+      await fetch(form.action, {
+        method: 'POST',
+        body: fd,
+        headers: { 'Accept': 'application/json' }
+      });
 
-        if (res.ok) {
-          form.classList.add('hidden');
-          successBox.style.display = 'block';
-          // Abrir PDF en nueva pestaña
-          window.open('https://drive.google.com/file/d/1TkZtjCQ8II0cnSowtQTAuvJw_Q7puMSi/view?usp=drive_link', '_blank');
-        } else {
-          btn.textContent = 'DESCÁRGALO GRATIS ⬇';
-          btn.disabled = false;
-          alert('Hubo un error. Intentalo de nuevo.');
-        }
-      } catch(err) {
-        btn.textContent = 'DESCÁRGALO GRATIS ⬇';
-        btn.disabled = false;
-        alert('Error de conexión. Intentalo de nuevo.');
-      }
-    });
-  </script>
+      // 2. Brevo via Netlify function
+      await fetch('/.netlify/functions/brevo-subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, nombre: nombre })
+      });
+
+      // 3. Redirigir al PDF
+      const nextUrl = fd.get('_next') || 'https://drive.google.com/';
+      window.location.href = nextUrl;
+
+    } catch (err) {
+      console.error('Error:', err);
+      btn.textContent = 'DESCÁRGALO GRATIS ↓';
+      btn.disabled = false;
+      alert('Error de conexión. Intentalo de nuevo.');
+    }
+  });
+</script>
 
 </body>
 </html>
