@@ -746,39 +746,3 @@
 
 </body>
 </html>
-        // === Registrar contacto en Brevo lista #5 ===
-        try {
-          const fd2 = new FormData(form);
-          await fetch('https://api.brevo.com/v3/contacts', {
-            method: 'POST',
-            headers: {
-              'accept': 'application/json',
-              'content-type': 'application/json',
-              'api-key': 'BREVO_API_KEY_PLACEHOLDER'
-            },
-            body: JSON.stringify({
-              email: fd2.get('email'),
-              attributes: { FIRSTNAME: fd2.get('nombre') },
-              listIds: [5],
-              updateEnabled: true
-            })
-          });
-  
-        // === Registrar contacto en Brevo via Netlify Function ===
-        try {
-          const fd2 = new FormData(form);
-          await fetch('/.netlify/functions/brevo-subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: fd2.get('email'),
-              nombre: fd2.get('nombre')
-            })
-          });
-        } catch (brevoErr) {
-          console.warn('Brevo error (no bloquea el flujo):', brevoErr);
-        }
-            } catch (brevoErr) {
-          console.warn('Brevo error (no bloquea el flujo):', brevoErr);
-        }
-
